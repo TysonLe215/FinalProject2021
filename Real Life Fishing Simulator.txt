@@ -1,0 +1,100 @@
+import pygame
+import random
+import math
+from sys import exit
+
+# Initialize game
+pygame.init()
+
+# Create window
+s_width = 800
+s_height = 457
+screen = pygame.display.set_mode((s_width, s_height))
+pygame.display.set_caption('Real Life Fishing Simulator')
+
+# Background image
+background = pygame.image.load('background.jpg').convert()
+
+# Clock function
+clock = pygame.time.Clock()
+
+# Score text display
+test_font = pygame.font.Font(None, 50)
+text_surf = test_font.render('Score:', False, 'black')
+
+# Fish score var
+fish_counter = 0
+
+# Game active var
+game_active = True
+
+# The Fish code
+class Sprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('fish.png').convert_alpha()
+        self.rect = self.image.get_rect(center = (fishX, fishY))
+
+for i in range(100):
+    fishX = random.randrange(0, 700, 5)
+    fishY = random.randrange(0, 400, 5)
+    fish_surf = pygame.image.load('fish.png').convert_alpha()
+    fish_rect = fish_surf.get_rect(center = (fishX, fishY))
+
+# Player mouse code
+def mouse():
+    global mouse_pos
+    mouse_pos = pygame.mouse.get_pos()
+
+# Fish position randomizer code
+def fish_pos(fishX, fishY):
+    screen.blit(fish_surf, (fishX, fishY))
+
+# Fish score code
+def display_score():
+    score_surf = test_font.render(f'{fish_counter}', False, (0, 0, 0))
+    score_rect = score_surf.get_rect(center = (150, 20))
+    screen.blit(score_surf, score_rect)
+
+# Main code
+while True:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+        if event.type == pygame.MOUSEMOTION:
+            if fish_rect.collidepoint(mouse_pos):
+                fish_counter += 1
+                if fish_counter < 100:
+                    fish_rect = screen.blit(fish_surf, (fishX, fishY))
+
+    if game_active:
+        # RGB screen
+        screen.fill((0, 0, 0))
+
+        # Background image
+        screen.blit(background, (0, 0))
+        display_score()
+
+        # Player mouse code
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Fish surface
+        screen.blit(fish_surf, fish_rect)
+
+        # Text position
+        screen.blit(text_surf, (0, 0))
+
+        # Game over code
+        if fish_counter == 100:
+            game_active = False
+    else:
+        screen.fill('black')
+        game_over_font = pygame.font.Font(None, 50)
+        game_over_text = game_over_font.render('Game Over', False, 'white')
+        screen.blit(game_over_text, (280, 200))
+
+    pygame.display.update()
+    clock.tick(60)
